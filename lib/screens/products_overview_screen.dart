@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopping_cart_flutter/providers/cart.dart';
 import 'package:shopping_cart_flutter/providers/products.dart';
+import 'package:shopping_cart_flutter/screens/cart_screen.dart';
+import 'package:shopping_cart_flutter/widgets/badge.dart';
 
 import '../widgets/products_grid.dart';
 
@@ -18,7 +21,6 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
   bool _showOnlyFavorites = false;
   @override
   Widget build(BuildContext context) {
-//    final productsContainer = Provider.of<Products>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: Text('My Shop'),
@@ -40,6 +42,18 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
                   value: FileterOptions.Favorites),
               PopupMenuItem(child: Text("show all"), value: FileterOptions.All)
             ],
+          ),
+          Consumer<Cart>(
+            builder: (_, cart, ch) => Badge(
+              child: ch,
+              value: cart.itemCount.toString(),
+            ),
+            child: IconButton(
+              icon: Icon(Icons.shopping_cart),
+              onPressed: () {
+                Navigator.of(context).pushNamed(CartScreen.routeName);
+              },
+            ),
           )
         ],
       ),
