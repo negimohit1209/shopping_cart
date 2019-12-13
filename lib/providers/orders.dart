@@ -15,7 +15,7 @@ class OrderItem {
       @required this.dateTime});
 }
 
-class Order with ChangeNotifier {
+class Orders with ChangeNotifier {
   List<OrderItem> _orders;
   List<OrderItem> get orders => [..._orders];
 
