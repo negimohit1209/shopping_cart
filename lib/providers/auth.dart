@@ -41,6 +41,8 @@ class Auth with ChangeNotifier {
       _userId = responseData['localId'];
       _expiryDate = DateTime.now()
           .add(Duration(seconds: int.parse(responseData['expiresIn'])));
+      print(_token);
+      notifyListeners();
     } catch (e) {
       throw e;
     }
