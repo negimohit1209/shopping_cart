@@ -43,8 +43,9 @@ class Products with ChangeNotifier {
 //  var _showFavoritesOnly = false;
 
   final String authtoken;
+  final String userId;
 
-  Products(this.authtoken, this._items);
+  Products(this.authtoken, this.userId, this._items);
 
   List<Product> get items {
     return [..._items];
@@ -65,14 +66,20 @@ class Products with ChangeNotifier {
 //    notifyListeners();
 //  }
 
-  Future<void> fetchAndSetProducts() async {
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    final String filterString =
+        filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
     final url =
-        'https://shopping-app-cce51.firebaseio.com/products.json?auth=$authtoken';
+        'https://shopping-app-cce51.firebaseio.com/products.json?auth=$authtoken&$filterString';
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
       final List<Product> loadedProducts = [];
       if (extractedData == null) return;
+      final url2 =
+          'https://shopping-app-cce51.firebaseio.com/userFavorites/$userId.json?auth=$authtoken';
+      final favouriteRes = await http.get(url2);
+      final favoriteData = json.decode(favouriteRes.body);
       extractedData.forEach((key, value) {
         loadedProducts.add(
           Product(
@@ -81,7 +88,8 @@ class Products with ChangeNotifier {
             description: value['description'],
             price: value['price'],
             imageUrl: value['imageUrl'],
-            isFavourite: value['isFavourite'],
+            isFavourite:
+                favoriteData == null ? false : favoriteData[key] ?? false,
           ),
         );
       });
@@ -102,7 +110,7 @@ class Products with ChangeNotifier {
             'description': product.description,
             'price': product.price,
             'imageUrl': product.imageUrl,
-            'isFavourite': product.isFavourite
+            'creatorId': userId
           }));
       final newProduct = Product(
         id: json.decode(response.body)['name'],
@@ -129,6 +137,7 @@ class Products with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
+          'creatorId': userId
         }));
     if (prodIndex >= 0) {
       _items[prodIndex] = product;
