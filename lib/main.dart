@@ -5,9 +5,9 @@ import 'package:shopping_cart_flutter/providers/cart.dart';
 import 'package:shopping_cart_flutter/providers/orders.dart';
 import 'package:shopping_cart_flutter/screens/cart_screen.dart';
 import 'package:shopping_cart_flutter/screens/product_detail_screen.dart';
-//import 'package:shopping_cart_flutter/screens/products_overview_screen.dart';
 import 'package:shopping_cart_flutter/providers/products.dart';
 import 'package:shopping_cart_flutter/screens/products_overview_screen.dart';
+import './screens/splash_screen.dart';
 import './screens/orders_screen.dart';
 import './screens/user_product_screen.dart';
 import './screens/edit_product_screen.dart';
@@ -43,7 +43,14 @@ class MyApp extends StatelessWidget {
               primarySwatch: Colors.purple,
               accentColor: Colors.deepOrange,
               fontFamily: 'Lato'),
-          home: auth.isAuth ? ProductOverviewScreen() : AuthScreen(),
+          home: auth.isAuth
+              ? ProductOverviewScreen()
+              : FutureBuilder(
+                  future: auth.tryAutoLogin(),
+                  builder: (context, authResultSnap) =>
+                      authResultSnap.connectionState == ConnectionState.waiting
+                          ? Splashscreen()
+                          : AuthScreen()),
           routes: {
             ProductDetailScreen.routeName: (context) => ProductDetailScreen(),
             CartScreen.routeName: (context) => CartScreen(),
